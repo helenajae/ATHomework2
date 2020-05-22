@@ -11,7 +11,5 @@ public class App {
         } catch (Exception ex) {
             System.out.println("Something went horribly wrong");
         }
-
     }
-
 }
