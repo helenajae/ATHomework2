@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import school.Course;
-import services.PublicHolidayService;
+import service.PublicHolidayService;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.ZonedDateTime;
 //import static org.junit.Assert.*;

@@ -20,7 +20,7 @@ public class PublicHolidayServiceTest {
 
 
     @Test(expected = JSONException.class)
-    public void throws_exception_on_invalid_api_response() throws Exception {
+    public void exeptionInvalidApiResponse() throws Exception {
         stubFor(any(anyUrl())
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -32,7 +32,7 @@ public class PublicHolidayServiceTest {
         List<ZonedDateTime> result = service.getPublicHolidays("2020");
 
         //then
-        //assertEquals(10, result.size());
+        assertEquals(10, result.size());
 
         verify(postRequestedFor(urlMatching("https://date.nager.at/api/v2/PublicHolidays/[0-9]+/[a-z]+"))
                 .withRequestBody(matching(".*<message>1234</message>.*"))
@@ -40,7 +40,7 @@ public class PublicHolidayServiceTest {
     }
 
     @Test
-    public void processes_api_response() throws Exception {
+    public void processesApiResponse() throws Exception {
         stubFor(any(anyUrl())
                 .willReturn(aResponse()
                         .withStatus(200)
