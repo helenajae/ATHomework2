@@ -1,16 +1,17 @@
 package service;
 
-        import com.github.tomakehurst.wiremock.junit.WireMockRule;
-        import org.json.JSONException;
-        import org.junit.Rule;
-        import org.junit.Test;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.json.JSONException;
+import org.junit.Rule;
+import org.junit.Test;
 
-        import java.io.IOException;
-        import java.time.ZonedDateTime;
-        import java.util.List;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.List;
 
-        import static com.github.tomakehurst.wiremock.client.WireMock.*;
-        import static org.junit.Assert.assertEquals;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.assertEquals;
 
 public class PublicHolidayServiceTest {
 
@@ -27,7 +28,6 @@ public class PublicHolidayServiceTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/xml")
                         .withBody("<response>Some content</response>")));
-
 
         //when
         List<ZonedDateTime> result = service.getPublicHolidays("2020");
@@ -48,7 +48,6 @@ public class PublicHolidayServiceTest {
                         .withHeader("Content-Type", "text/xml")
                         .withBody("[{\"date\":\"2020-01-01\",\"localName\":\"uusaasta\",\"name\":\"New Year's Day\",\"countryCode\":\"EE\",\"fixed\":true,\"global\":true,\"counties\":null,\"launchYear\":null,\"type\":\"Public\"}]")));
 
-
         //when
         List<ZonedDateTime> result = service.getPublicHolidays("2020");
 
@@ -65,6 +64,7 @@ public class PublicHolidayServiceTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "text/xml")
                         .withBody("{}")));
+
         //when
         List<ZonedDateTime> result = service.getPublicHolidays("2020");
 
@@ -85,5 +85,36 @@ public class PublicHolidayServiceTest {
         //then
         verify(getRequestedFor(urlEqualTo("/2020/EE")));
     }
-    
+
+    @Test (expected = FileNotFoundException.class)
+    public void errorJSON() throws Exception {
+        stubFor(any(anyUrl())
+                .willReturn(aResponse()
+                        .withStatus(404)
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody("<response>Some content</response>")));
+
+        //when
+        List<ZonedDateTime> result = service.getPublicHolidays("2020");
+
+        //then
+        verify(getRequestedFor(urlEqualTo("/2020/EE")));
+    }
+
+    @Test (expected = JSONException.class)
+    public void noData() throws Exception {
+        stubFor(any(anyUrl())
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody("[{\"localName\":\"uusaasta\",\"name\":\"New Year's Day\",\"countryCode\":\"EE\",\"fixed\":true,\"global\":true,\"counties\":null,\"launchYear\":null,\"type\":\"Public\"}]")));
+
+        //when
+        List<ZonedDateTime> result = service.getPublicHolidays("2020");
+
+        //then
+        assertEquals(1, result.size());
+        assertEquals(ZonedDateTime.parse("2020-01-01T00:00:00.000+00:00[UTC]"), result.get(0));
+        verify(getRequestedFor(urlEqualTo("/2020/EE")));
+    }
 }
