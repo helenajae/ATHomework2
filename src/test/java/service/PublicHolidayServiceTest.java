@@ -5,6 +5,7 @@ package service;
         import org.junit.Rule;
         import org.junit.Test;
 
+        import java.io.IOException;
         import java.time.ZonedDateTime;
         import java.util.List;
 
@@ -54,8 +55,35 @@ public class PublicHolidayServiceTest {
         //then
         assertEquals(1, result.size());
         assertEquals(ZonedDateTime.parse("2020-01-01T00:00:00.000+00:00[UTC]"), result.get(0));
-
         verify(getRequestedFor(urlEqualTo("/2020/EE")));
     }
 
+    @Test(expected = JSONException.class)
+    public void emptyObjectJSON() throws Exception {
+        stubFor(any(anyUrl())
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody("{}")));
+        //when
+        List<ZonedDateTime> result = service.getPublicHolidays("2020");
+
+        //then
+        verify(getRequestedFor(urlEqualTo("/2020/EE")));
+    }
+
+    @Test
+    public void emptyArrayJSON() throws IOException {
+        stubFor(any(anyUrl())
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody("[]")));
+        //when
+        List<ZonedDateTime> result = service.getPublicHolidays("2020");
+
+        //then
+        verify(getRequestedFor(urlEqualTo("/2020/EE")));
+    }
+    
 }
