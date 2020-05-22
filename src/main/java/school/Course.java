@@ -1,6 +1,6 @@
 package school;
 
-import services.PublicHolidayService;
+import service.PublicHolidayService;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
